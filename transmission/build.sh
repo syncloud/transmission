@@ -10,7 +10,7 @@ rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
 
 apt update
-apt -y install build-essential cmake
+apt -y install build-essential cmake wget
 
 cd ${BUILD_DIR}
 wget --progress dot:giga https://github.com/transmission/transmission/archive/refs/tags/$VERSION.tar.gz
