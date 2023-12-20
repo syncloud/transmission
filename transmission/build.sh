@@ -10,8 +10,7 @@ rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
 
 apt update
-apt -y install build-essential cmake wget
-
+apt -y install build-essential cmake wget libcurl4-openssl-dev libssl-dev
 cd ${BUILD_DIR}
 wget --progress dot:giga https://github.com/transmission/transmission/archive/refs/tags/$VERSION.tar.gz
 tar xf $VERSION.tar.gz
