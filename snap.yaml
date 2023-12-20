@@ -1,0 +1,30 @@
+apps:
+  web:
+    user: transmission
+    command: bin/service.web.sh
+    daemon: simple
+    plugs:
+    - network
+    - network-bind
+    restart-condition: always
+
+  storage-change:
+    command: bin/cli storage-change
+
+  access-change:
+    command: bin/cli access-change
+
+  backup-pre-stop:
+    command: bin/cli backup-pre-stop
+
+  restore-pre-start:
+    command: bin/cli restore-pre-start
+
+  restore-post-start:
+    command: bin/cli restore-post-start
+
+confinement: strict
+description: Transmission
+grade: stable
+name: transmission
+summary: Transmission
