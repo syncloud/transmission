@@ -15,7 +15,7 @@ cd ${BUILD_DIR}
 wget --progress dot:giga https://github.com/transmission/transmission/releases/download/$VERSION/transmission-$VERSION.tar.xz
 tar xf transmission-$VERSION.tar.xz
 cd transmission-$VERSION
-cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_GTK=OFF
+cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_GTK=OFF -DINSTALL_LIB=OFF
 cd build
 cmake --build .
 
