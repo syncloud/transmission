@@ -21,7 +21,7 @@ local build(arch, test_ui, dind) = [{
         },
         {
             name: "transmission",
-            image: "debian:buster-slim",
+            image: "debian:bookworm-slim",
             commands: [
                 "./transmission/build.sh " + version
             ],
