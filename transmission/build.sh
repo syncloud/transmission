@@ -34,8 +34,7 @@ mkdir -p $TARGET
 cp -r /bin ${TARGET}
 cp -r /sbin ${TARGET}
 cp -r /lib* ${TARGET}
-cp -r /usr/lib ${TARGET}
-cp -r /usr/local/lib ${TARGET}
+cp -r /usr ${TARGET}
 
 cp $DIR/transmission.sh ${TARGET}/bin
 

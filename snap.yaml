@@ -1,7 +1,7 @@
 apps:
   web:
     user: transmission
-    command: bin/service.web.sh
+    command: bin/service.daemon.sh
     daemon: simple
     plugs:
     - network
