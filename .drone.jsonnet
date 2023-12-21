@@ -32,6 +32,13 @@ local build(arch, test_ui, dind) = [{
                 }
             ]
         },
+ {
+            name: "test transmission",
+            image: "debian:buster-slim",
+            commands: [
+                "./transmission/test.sh"
+            ]
+        },
         {
             name: "cli",
             image: "golang:1.20",
