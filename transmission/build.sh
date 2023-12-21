@@ -18,6 +18,7 @@ cd transmission-$VERSION
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_GTK=OFF -DINSTALL_LIB=OFF
 cd build
 cmake --build .
+cmake --install .
 
 # cleanup
 apt-get -y purge build-essential
@@ -29,7 +30,7 @@ rm -rf \
     /root/.cache
 
 TARGET=${DIR}/../build/snap/transmission
-mkdir $TARGET
+mkdir -p $TARGET
 cp -r /bin ${TARGET}
 cp -r /sbin ${TARGET}
 cp -r /lib* ${TARGET}
