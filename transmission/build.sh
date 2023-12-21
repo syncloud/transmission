@@ -13,7 +13,7 @@ apt update
 apt -y install build-essential cmake wget libcurl4-openssl-dev libssl-dev
 cd ${BUILD_DIR}
 wget --progress dot:giga https://github.com/transmission/transmission/releases/download/$VERSION/transmission-$VERSION.tar.xz
-tar xf transmission-$VERSION.tar.gz
+tar xf transmission-$VERSION.tar.xz
 cd transmission-$VERSION
 cmake -B build -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF
 cd build
