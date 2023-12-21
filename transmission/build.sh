@@ -38,4 +38,4 @@ cp -r /usr ${TARGET}
 
 cp $DIR/transmission.sh ${TARGET}/bin
 
-ldd ${TARGET}/usr/sbin/transmission
+ldd ${TARGET}/usr/local/bin/transmission-daemon
