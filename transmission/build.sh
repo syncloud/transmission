@@ -10,7 +10,7 @@ rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
 
 apt update
-apt -y install build-essential cmake wget libcurl4-openssl-dev libssl-dev python3
+apt -y install build-essential cmake wget libcurl4-openssl-dev libssl-dev python3 ninja-build
 cd ${BUILD_DIR}
 wget --progress dot:giga https://github.com/transmission/transmission/releases/download/$VERSION/transmission-$VERSION.tar.xz
 tar xf transmission-$VERSION.tar.xz
