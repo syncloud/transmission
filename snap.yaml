@@ -7,6 +7,14 @@ apps:
     - network
     - network-bind
     restart-condition: always
+  authelia:
+    user: transmission
+    command: bin/service.authelia.sh
+    daemon: simple
+    plugs:
+    - network
+    - network-bind
+    restart-condition: always
   daemon:
     user: transmission
     command: bin/service.daemon.sh

@@ -35,6 +35,11 @@ func (i *Installer) Install() error {
 		return err
 	}
 
+	err = os.Mkdir(path.Join(DataDir, "nginx"), 0755)
+	if err != nil {
+		return err
+	}
+
 	err = i.UpdateConfigs()
 	if err != nil {
 		return err
