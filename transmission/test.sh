@@ -5,6 +5,6 @@ PREFIX=${DIR}/../build/snap/transmission
 
 du -d10 -h $PREFIX | sort -h | tail -100
 
-ldd ${PREFIX}/usr/sbin/postfix
+ldd ${PREFIX}/usr/local/bin/transmission-daemon
 ls -la ${PREFIX}/bin
 ${PREFIX}/bin/transmission.sh --help
