@@ -4,7 +4,7 @@ DIR=$( cd "$( dirname "$0" )" && pwd )
 cd ${DIR}
 VERSION=$1
 BUILD_DIR=${DIR}/../build/snap/authelia
-while ! docker create --name=app authelia:$VERSION ; do
+while ! docker create --name=app authelia/authelia:$VERSION ; do
   sleep 1
   echo "retry docker"
 done
