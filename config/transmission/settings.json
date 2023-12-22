@@ -1,0 +1,3 @@
+{
+  "rpc-bind-address": "/var/snap/transmission/current/transmission.socket"
+}
