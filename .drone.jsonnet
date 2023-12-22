@@ -37,7 +37,7 @@ local build(arch, test_ui, dind) = [{
             name: "authelia",
             image: "docker:" + dind,
                 commands: [
-                "./authelia/build.sh " + nginx
+                "./authelia/build.sh " + authelia
             ],
             volumes: [
                 {
