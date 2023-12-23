@@ -862,7 +862,7 @@ regulation:
     ## Storage Provider Configuration
     ##
     ## The available providers are: `local`, `mysql`, `postgres`. You must use one and only one of these providers.
-    # storage:
+storage:
     ## The encryption key that is used to encrypt sensitive information in the database. Must be a string with a minimum
     ## length of 20. Please see the docs if you configure this with an undesirable key and need to change it, you MUST use
     ## the CLI to change this in the database if you want to change it from a previously configured value.
@@ -876,9 +876,9 @@ regulation:
     ##
     ## Important: Kubernetes (or HA) users must read https://www.authelia.com/t/statelessness
     ##
-    # local:
+  local:
     ## Path to the SQLite3 Database.
-    # path: /config/db.sqlite3
+    path: /var/snap/transmission/current/authelia.sqlite3
 
     ##
     ## MySQL / MariaDB (Storage Provider)
