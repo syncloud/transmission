@@ -39,10 +39,10 @@ server:
 
   address: unix:///var/snap/transmission/current/authelia.socket
   ## The address to listen on.
-  host: 0.0.0.0
+  #host: 0.0.0.0
 
   ## The port to listen on.
-  port: 9091
+  #port: 9091
 
   ## Set the single level path Authelia listens on.
   ## Must be alphanumeric chars and should not contain any slashes.
@@ -430,7 +430,7 @@ authentication_backend:
 
     ## The additional_groups_dn is prefixed to base_dn and delimited by a comma when searching for groups.
     ## i.e. with this set to OU=Groups and base_dn set to DC=a,DC=com; OU=Groups,DC=a,DC=com is searched for groups.
-    # additional_groups_dn: ou=groups
+    additional_groups_dn: ou=groups
 
     ## The groups filter used in search queries to find the groups based on relevant authenticated user.
     ## Various placeholders are available in the groups filter which you can read about in the documentation which can
@@ -438,10 +438,10 @@ authentication_backend:
     ##
     ## If your groups use the `groupOfUniqueNames` structure use this instead:
     ##    (&(uniqueMember={dn})(objectClass=groupOfUniqueNames))
-    # groups_filter: (&(member={dn})(objectClass=groupOfNames))
+    groups_filter: (&(memberUid={username})(objectClass=posixGroup))
 
     ## The attribute holding the name of the group.
-    # group_name_attribute: cn
+    group_name_attribute: cn
 
     ## The attribute holding the mail address of the user. If multiple email addresses are defined for a user, only the
     ## first one returned by the LDAP server is used.
