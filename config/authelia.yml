@@ -110,10 +110,10 @@ server:
 ##
 log:
   ## Level of verbosity for logs: info, debug, trace.
-  level: debug
+  level: error
 
   ## Format the logs are written as: json, text.
-  # format: json
+  format: text
 
   ## File path where the logs will be written. If not set logs are written to stdout.
   # file_path: /config/authelia.log
@@ -282,7 +282,7 @@ authentication_backend:
     ## This is the recommended Authentication Provider in production
     ## because it allows Authelia to offload the stateful operations
     ## onto the LDAP service.
-    ldap:
+  ldap:
     ## The LDAP implementation, this affects elements like the attribute utilised for resetting a password.
     ## Acceptable options are as follows:
     ## - 'activedirectory' - For Microsoft Active Directory.
@@ -512,7 +512,7 @@ password_policy:
 
   ## The standard policy allows you to tune individual settings manually.
   standard:
-    enabled: false
+    enabled: true
 
     ## Require a minimum length for passwords.
     min_length: 8
@@ -569,7 +569,7 @@ password_policy:
 access_control:
   ## Default policy can either be 'bypass', 'one_factor', 'two_factor' or 'deny'. It is the policy applied to any
   ## resource if there is no policy to be applied to the user.
-  default_policy: deny
+  default_policy: one_factor
 
     # networks:
     # - name: internal
@@ -1118,12 +1118,12 @@ notifier:
     ##        (only works for unauthenticated connections)
     ##   - validate the SMTP server x509 certificate during the TLS handshake against the hosts trusted certificates
     ##     (configure in tls section)
-    # smtp:
+  smtp:
     ## The SMTP host to connect to.
     # host: 127.0.0.1
 
     ## The port to connect to the SMTP host on.
-    # port: 1025
+    port: 25
 
     ## The connection timeout.
     # timeout: 5s
