@@ -1,6 +1,6 @@
 local name = "transmission";
 local browser = "firefox";
-local version = "4.0.4";
+local version = "4.0.5";
 local nginx = "1.24.0";
 local authelia = "v4.38.0-beta3";
 
