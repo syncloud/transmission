@@ -132,15 +132,26 @@ func (i *Installer) UpdateConfigs() error {
 	if err != nil {
 		return err
 	}
+	vars := map[string]string{
+		"domain":         domain,
+		"encryption_key": string(encryptionKey),
+	}
 
-	return i.InjectVariables(
+	err = i.InjectVariables(
 		path.Join(AppDir, "config", "authelia", "config.yml"),
 		path.Join(DataDir, "config", "authelia", "config.yml"),
-		map[string]string{
-			"domain":         domain,
-			"encryption_key": string(encryptionKey),
-		},
+		vars,
 	)
+	if err != nil {
+		return err
+	}
+	err = i.InjectVariables(
+		path.Join(AppDir, "config", "authelia", "authrequest.yml"),
+		path.Join(DataDir, "config", "authelia", "authrequest.yml"),
+		vars,
+	)
+
+	return err
 
 }
 
