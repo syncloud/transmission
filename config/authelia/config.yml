@@ -110,7 +110,7 @@ server:
 ##
 log:
   ## Level of verbosity for logs: info, debug, trace.
-  level: error
+  level: trace
 
   ## Format the logs are written as: json, text.
   format: text
