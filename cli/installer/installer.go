@@ -146,8 +146,8 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 	err = i.InjectVariables(
-		path.Join(AppDir, "config", "authelia", "authrequest.yml"),
-		path.Join(DataDir, "config", "authelia", "authrequest.yml"),
+		path.Join(AppDir, "config", "authelia", "authrequest.conf"),
+		path.Join(DataDir, "config", "authelia", "authrequest.conf"),
 		vars,
 	)
 
