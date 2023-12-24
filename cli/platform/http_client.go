@@ -26,3 +26,7 @@ func NewHttpClient() *RealHttpClient {
 func (c *RealHttpClient) Post(url string, values url.Values) (resp *http.Response, err error) {
 	return c.client.PostForm(url, values)
 }
+
+func (c *RealHttpClient) Get(url string) (resp *http.Response, err error) {
+	return c.client.Get(url)
+}

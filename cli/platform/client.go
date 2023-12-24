@@ -12,6 +12,7 @@ import (
 
 type HttpClient interface {
 	Post(url string, values url.Values) (resp *http.Response, err error)
+	Get(url string) (resp *http.Response, err error)
 }
 
 type Client struct {
@@ -40,7 +41,28 @@ func (c *Client) InitStorage(app, user string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	var responseJson InitStorageResponse
+	var responseJson Response
+	err = json.Unmarshal(bodyBytes, &responseJson)
+	if err != nil {
+		return "", err
+	}
+	return responseJson.Data, nil
+}
+
+func (c *Client) GetAppDomainName(app string) (string, error) {
+	c.logger.Info("get app domain name", zap.String("app", app))
+	resp, err := c.client.Get(fmt.Sprintf("http://unix/app/domain_name?name=%s", app))
+	if err != nil {
+		return "", err
+	}
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("get app domain name, %s", resp.Status)
+	}
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	var responseJson Response
 	err = json.Unmarshal(bodyBytes, &responseJson)
 	if err != nil {
 		return "", err

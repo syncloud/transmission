@@ -1,10 +1,13 @@
 package installer
 
 import (
+	"fmt"
+	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
 	"hooks/platform"
 	"os"
 	"path"
+	"strings"
 )
 
 const (
@@ -15,17 +18,22 @@ const (
 )
 
 type Installer struct {
-	newVersionFile     string
-	currentVersionFile string
-	configDir          string
+	newVersionFile                   string
+	currentVersionFile               string
+	configDir                        string
+	platformClient                   *platform.Client
+	autheliaStorageEncryptionKeyFile string
 }
 
 func New() *Installer {
 	configDir := path.Join(DataDir, "config")
+
 	return &Installer{
-		newVersionFile:     path.Join(AppDir, "version"),
-		currentVersionFile: path.Join(DataDir, "version"),
-		configDir:          configDir,
+		newVersionFile:                   path.Join(AppDir, "version"),
+		currentVersionFile:               path.Join(DataDir, "version"),
+		configDir:                        configDir,
+		platformClient:                   platform.New(),
+		autheliaStorageEncryptionKeyFile: path.Join(DataDir, "authelia.storage.encryption.key"),
 	}
 }
 
@@ -36,6 +44,12 @@ func (i *Installer) Install() error {
 	}
 
 	err = os.Mkdir(path.Join(DataDir, "nginx"), 0755)
+	if err != nil {
+		return err
+	}
+
+	secretKey := uuid.New().String()
+	err = os.WriteFile(i.autheliaStorageEncryptionKeyFile, []byte(secretKey), 0644)
 	if err != nil {
 		return err
 	}
@@ -84,22 +98,10 @@ func (i *Installer) PostRefresh() error {
 
 }
 func (i *Installer) StorageChange() error {
-	storageDir, err := platform.New().InitStorage(App, App)
+	storageDir, err := i.platformClient.InitStorage(App, App)
 	if err != nil {
 		return err
 	}
-	//	err = os.Mkdir(path.Join(storageDir, "cache"), 0755)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	err = os.Mkdir(path.Join(storageDir, "photos"), 0755)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	err = os.Mkdir(path.Join(storageDir, "temp"), 0755)
-	//	if err != nil {
-	//		return err
-	//	}
 	err = Chown(storageDir, App)
 	if err != nil {
 		return err
@@ -116,7 +118,42 @@ func (i *Installer) UpdateVersion() error {
 }
 
 func (i *Installer) UpdateConfigs() error {
-	return cp.Copy(path.Join(AppDir, "config"), path.Join(DataDir, "config"))
+
+	err := cp.Copy(path.Join(AppDir, "config"), path.Join(DataDir, "config"))
+	if err != nil {
+		return err
+	}
+
+	domain, err := i.platformClient.GetAppDomainName(App)
+	if err != nil {
+		return err
+	}
+	encryptionKey, err := os.ReadFile(i.autheliaStorageEncryptionKeyFile)
+	if err != nil {
+		return err
+	}
+
+	return i.InjectVariables(
+		path.Join(AppDir, "config", "authelia", "config.yml"),
+		path.Join(DataDir, "config", "authelia", "config.yml"),
+		map[string]string{
+			"domain":         domain,
+			"encryption_key": string(encryptionKey),
+		},
+	)
+
+}
+
+func (i *Installer) InjectVariables(from, to string, vars map[string]string) error {
+	templateFile, err := os.ReadFile(from)
+	if err != nil {
+		return err
+	}
+	template := string(templateFile)
+	for key, value := range vars {
+		template = strings.ReplaceAll(template, fmt.Sprintf("{{ %s }}", key), value)
+	}
+	return os.WriteFile(to, []byte(template), 0644)
 }
 
 func (i *Installer) FixPermissions() error {

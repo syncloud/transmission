@@ -667,7 +667,7 @@ session:
   ## The domain to protect.
   ## Note: the authenticator must also be in that domain.
   ## If empty, the cookie is restricted to the subdomain of the issuer.
-  domain: example.com
+  domain: {{ domain }}
 
   ## Sets the Cookie SameSite value. Possible options are none, lax, or strict.
   ## Please read https://www.authelia.com/c/session#same_site
@@ -675,7 +675,7 @@ session:
 
   ## The secret to encrypt the session data. This is only used with Redis / Redis Sentinel.
   ## Secret can also be set using a secret: https://www.authelia.com/c/secrets
-  secret: insecure_session_secret
+  # secret: insecure_session_secret
 
   ## The value for expiration, inactivity, and remember_me_duration are in seconds or the duration notation format.
   ## See: https://www.authelia.com/c/common#duration-notation-format
@@ -866,7 +866,7 @@ storage:
     ## The encryption key that is used to encrypt sensitive information in the database. Must be a string with a minimum
     ## length of 20. Please see the docs if you configure this with an undesirable key and need to change it, you MUST use
     ## the CLI to change this in the database if you want to change it from a previously configured value.
-  encryption_key: you_must_generate_a_random_string_of_more_than_twenty_chars_and_configure_this
+  encryption_key: {{ encryption_key }}
 
     ##
     ## Local (Storage Provider)

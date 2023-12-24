@@ -1,6 +1,6 @@
 package platform
 
-type InitStorageResponse struct {
+type Response struct {
 	Success bool   `json:"success"`
 	Data    string `json:"data"`
 }
