@@ -49,7 +49,8 @@ def test_start(module_setup, device, device_host, app, domain):
     add_host_alias(app, device_host, domain)
     device.run_ssh('date', retries=100)
     device.run_ssh('mkdir {0}'.format(TMP_DIR))
-
+    device.run_ssh('snap refresh platform --channel=master --amend', throw=False)  
+  
 
 def test_activate_device(device):
     response = retry(device.activate_custom)
