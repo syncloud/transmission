@@ -36,7 +36,20 @@ local build(arch, test_ui, dind) = [{
       {
             name: "authelia",
             image: "docker:" + dind,
-                commands: [
+            commands: [
+                "./authelia/package.sh " + authelia
+            ],
+            volumes: [
+                {
+                    name: "dockersock",
+                    path: "/var/run"
+                }
+            ]
+        },
+          {
+            name: "authelia fix",
+            image: "golang:1.21.5-alpine3.18",
+            commands: [
                 "./authelia/build.sh " + authelia
             ],
             volumes: [
