@@ -12,4 +12,4 @@ cd authelia-4.38.0-beta3
 sed -i 's#config.Server.Address.SetPath("/")#config.Server.Address.SetPath("/authelia")#g' internal/configuration/validator/server.go
 CGO_ENABLED=1 CGO_CPPFLAGS="-D_FORTIFY_SOURCE=2 -fstack-protector-strong" CGO_LDFLAGS="-Wl,-z,relro,-z,now" go build \
 	-ldflags "-linkmode=external -s -w ${LDFLAGS_EXTRA}" -trimpath -buildmode=pie -o authelia ./cmd/authelia
-cp ${DIR}/authelia ${BUILD_DIR}/app/authelia
+cp authelia ${BUILD_DIR}/app/authelia
