@@ -37,7 +37,7 @@ default_2fa_method: ""
 ##
 server:
 
-  address: unix:///var/snap/transmission/current/authelia.socket:0/authelia
+  address: unix:///var/snap/transmission/current/authelia.socket
   ## The address to listen on.
   #host: 0.0.0.0
 
