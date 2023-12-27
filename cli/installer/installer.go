@@ -23,6 +23,7 @@ type Installer struct {
 	configDir                        string
 	platformClient                   *platform.Client
 	autheliaStorageEncryptionKeyFile string
+	autheliaJwtSecretFile            string
 }
 
 func New() *Installer {
@@ -34,6 +35,7 @@ func New() *Installer {
 		configDir:                        configDir,
 		platformClient:                   platform.New(),
 		autheliaStorageEncryptionKeyFile: path.Join(DataDir, "authelia.storage.encryption.key"),
+		autheliaJwtSecretFile:            path.Join(DataDir, "authelia.jwt.secret"),
 	}
 }
 
@@ -48,8 +50,12 @@ func (i *Installer) Install() error {
 		return err
 	}
 
-	secretKey := uuid.New().String()
-	err = os.WriteFile(i.autheliaStorageEncryptionKeyFile, []byte(secretKey), 0644)
+	err = os.WriteFile(i.autheliaStorageEncryptionKeyFile, []byte(uuid.New().String()), 0644)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(i.autheliaJwtSecretFile, []byte(uuid.New().String()), 0644)
 	if err != nil {
 		return err
 	}
@@ -132,9 +138,14 @@ func (i *Installer) UpdateConfigs() error {
 	if err != nil {
 		return err
 	}
+	jwtSecret, err := os.ReadFile(i.autheliaJwtSecretFile)
+	if err != nil {
+		return err
+	}
 	vars := map[string]string{
 		"domain":         domain,
 		"encryption_key": string(encryptionKey),
+		"jwt_secret":     string(jwtSecret),
 	}
 
 	err = i.InjectVariables(
