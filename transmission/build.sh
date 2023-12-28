@@ -20,7 +20,7 @@ cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF -DENABLE_MAC=
 cd build
 
 if [[ $ARCH == "arm" ]]; then
-  cmake --build -j 2 .
+  cmake --build . -j 2
 else
   cmake --build .
 fi
