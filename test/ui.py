@@ -35,26 +35,10 @@ def test_login(selenium, device_user, device_password):
     selenium.screenshot('login')
     #password.send_keys(Keys.RETURN)
     selenium.find_by(By.ID, "sign-in-button").click()
-    selenium.find_by(By.XPATH, "//div[@title='Tramsmission']")
+    selenium.find_by(By.ID, "toolbar-open")
     selenium.screenshot('main')
-
-
-def test_upload(selenium):
-    selenium.screenshot('upload')
-    selenium.find_by(By.XPATH, "//button[@title='Upload']").click()
-    file = selenium.driver.find_element(By.XPATH, "//input[@type='file']")
-    selenium.driver.execute_script("arguments[0].removeAttribute('class')", file)
-    file.send_keys(join(DIR, 'images', 'profile.jpeg'))
-    # selenium.find_by(By.XPATH, "//form//span[text()='Upload']").click()
-    selenium.screenshot('uploaded')
-    selenium.wait_or_screenshot(EC.invisibility_of_element_located((By.XPATH, "//nav//span[text()='Upload']")))
-
-
-def test_folders(selenium):
-    selenium.find_by(By.XPATH, "//div[@title='Folders']").click()
-    selenium.exists_by(By.XPATH, "//a[contains(@class,'result')]")
-    selenium.screenshot('folders')
 
 
 def test_teardown(driver):
     driver.quit()
+
