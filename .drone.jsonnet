@@ -2,7 +2,7 @@ local name = "transmission";
 local browser = "firefox";
 local version = "4.0.5";
 local nginx = "1.24.0";
-local authelia = "v4.38.0-beta3";
+local authelia = "master";
 
 local build(arch, test_ui, dind) = [{
     kind: "pipeline",
