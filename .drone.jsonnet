@@ -2,7 +2,7 @@ local name = "transmission";
 local browser = "firefox";
 local version = "4.0.5";
 local nginx = "1.24.0";
-local authelia = "feat-server-unix-path";
+local authelia = "master";
 
 local build(arch, test_ui, dind) = [{
     kind: "pipeline",
@@ -46,25 +46,11 @@ local build(arch, test_ui, dind) = [{
                 }
             ]
         },
-          {
-            name: "authelia fix",
-            image: "golang:1.21.5-alpine3.18",
-            commands: [
-	    	"echo skip",
-                #"./authelia/build.sh " + authelia
-            ],
-            volumes: [
-                {
-                    name: "dockersock",
-                    path: "/var/run"
-                }
-            ]
-        },
         {
             name: "transmission",
             image: "debian:bookworm-slim",
             commands: [
-                "./transmission/build.sh " + version
+                "./transmission/build.sh " + version + " " + arch
             ],
             volumes: [
                 {

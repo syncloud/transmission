@@ -1,10 +1,11 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
 
 DIR=$( cd "$( dirname "$0" )" && pwd )
 cd ${DIR}
 
 BUILD_DIR=${DIR}/build
 VERSION=$1
+ARCH=$2
 
 rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
@@ -17,7 +18,13 @@ tar xf transmission-$VERSION.tar.xz
 cd transmission-$VERSION
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_GTK=OFF -DENABLE_TESTS=OFF
 cd build
-cmake --build .
+
+if [[ $ARCH == "arm" ]]; then
+  cmake --build . -j 4
+else
+  cmake --build .
+fi
+
 cmake --install .
 
 # cleanup

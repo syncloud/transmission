@@ -1,3 +1,4 @@
 {
-  "rpc-bind-address": "/var/snap/transmission/current/transmission.socket"
+  "rpc-bind-address": "unix:/var/snap/transmission/current/transmission.socket",
+  "download-dir": "/data/transmission/download"
 }
