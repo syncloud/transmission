@@ -166,7 +166,7 @@ totp:
   disable: false
 
   ## The issuer name displayed in the Authenticator application of your choice.
-  issuer: authelia.com
+  issuer: {{ domain }}
 
   ## The TOTP algorithm to use.
   ## It is CRITICAL you read the documentation before changing this option:
