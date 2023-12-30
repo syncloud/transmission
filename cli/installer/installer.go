@@ -114,16 +114,17 @@ func (i *Installer) StorageChange() error {
 	if err != nil {
 		return err
 	}
-	err = Chown(storageDir, App)
-	if err != nil {
-		return err
-	}
 
 	err = os.Mkdir(path.Join(storageDir, "download"), 0755)
 	if err != nil {
 		if !os.IsExist(err) {
 			return err
 		}
+	}
+
+ err = Chown(storageDir, App)
+	if err != nil {
+		return err
 	}
 	return nil
 }
