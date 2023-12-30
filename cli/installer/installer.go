@@ -100,6 +100,12 @@ func (i *Installer) PostRefresh() error {
 	if err != nil {
 		return err
 	}
+
+	err = i.StorageChange()
+	if err != nil {
+		return err
+	}
+
 	return nil
 
 }
