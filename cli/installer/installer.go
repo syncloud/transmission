@@ -3,7 +3,7 @@ package installer
 import (
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/config"
-	"hooks/platform"
+	"github.com/syncloud/golib/platform"
 	"os"
 	"path"
 )
@@ -20,6 +20,11 @@ type Installer struct {
 	currentVersionFile string
 	configDir          string
 	platformClient     *platform.Client
+}
+
+type Variables struct {
+	Domain     string
+	AuthDomain string
 }
 
 func New() *Installer {
@@ -132,19 +137,13 @@ func (i *Installer) UpdateConfigs() error {
 	if err != nil {
 		return err
 	}
-	domain, err := i.platformClient.GetAppDomainName(App)
-	if err != nil {
-		return err
-	}
-	vars := map[string]string{
-		"domain":      domain,
-		"auth_domain": authDomain,
-	}
 
 	err = config.Generate(
 		path.Join(AppDir, "config"),
 		path.Join(DataDir, "config"),
-		vars,
+		Variables{
+			AuthDomain: authDomain,
+		},
 	)
 
 	return err
