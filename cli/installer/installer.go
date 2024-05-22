@@ -1,14 +1,11 @@
 package installer
 
 import (
-	"fmt"
-	"github.com/google/uuid"
 	cp "github.com/otiai10/copy"
-github.com/syncloud/golib/config"
+	"github.com/syncloud/golib/config"
 	"hooks/platform"
 	"os"
 	"path"
-	"strings"
 )
 
 const (
@@ -19,20 +16,20 @@ const (
 )
 
 type Installer struct {
-	newVersionFile                   string
-	currentVersionFile               string
-	configDir                        string
-	platformClient                   *platform.Client
+	newVersionFile     string
+	currentVersionFile string
+	configDir          string
+	platformClient     *platform.Client
 }
 
 func New() *Installer {
 	configDir := path.Join(DataDir, "config")
 
 	return &Installer{
-		newVersionFile:                   path.Join(AppDir, "version"),
-		currentVersionFile:               path.Join(DataDir, "version"),
-		configDir:                        configDir,
-		platformClient:                   platform.New(),
+		newVersionFile:     path.Join(AppDir, "version"),
+		currentVersionFile: path.Join(DataDir, "version"),
+		configDir:          configDir,
+		platformClient:     platform.New(),
 	}
 }
 
@@ -46,7 +43,6 @@ func (i *Installer) Install() error {
 	if err != nil {
 		return err
 	}
-
 
 	err = i.UpdateConfigs()
 	if err != nil {
@@ -110,7 +106,7 @@ func (i *Installer) StorageChange() error {
 		}
 	}
 
- err = Chown(storageDir, App)
+	err = Chown(storageDir, App)
 	if err != nil {
 		return err
 	}
@@ -136,12 +132,12 @@ func (i *Installer) UpdateConfigs() error {
 	if err != nil {
 		return err
 	}
- domain, err := i.platformClient.GetAppDomainName(App)
+	domain, err := i.platformClient.GetAppDomainName(App)
 	if err != nil {
 		return err
 	}
-		vars := map[string]string{
-		"domain":         domain,
+	vars := map[string]string{
+		"domain":      domain,
 		"auth_domain": authDomain,
 	}
 
