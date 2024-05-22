@@ -2,6 +2,8 @@ local name = "transmission";
 local browser = "firefox";
 local version = "4.0.5";
 local nginx = "1.24.0";
+local selenium = '4.21.0-20240517';
+local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
 
 local build(arch, test_ui, dind) = [{
     kind: "pipeline",
@@ -82,9 +84,28 @@ local build(arch, test_ui, dind) = [{
               "py.test -x -s test.py --distro=buster --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=" + name + ".buster.com --app=" + name + " --arch=" + arch
             ]
         }] + ( if test_ui then [
-        {
+{
+            name: "selenium",
+            image: "selenium/standalone-" + browser + ":" + selenium,
+            detach: true,
+            environment: {
+                SE_NODE_SESSION_TIMEOUT: "999999",
+                START_XVFB: "true"
+            },
+               volumes: [{
+                name: "shm",
+                path: "/dev/shm"
+            }],
+            commands: [
+                "cat /etc/hosts",
+                "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
+                "cat /etc/hosts",
+                "/opt/bin/entry_point.sh"
+            ]
+         },
+            {
             name: "selenium-video",
-            image: "selenium/video:ffmpeg-4.3.1-20220208",
+            image: 'selenium/video:ffmpeg-6.1.1-20240517',
             detach: true,
             environment: {
                 DISPLAY_CONTAINER_NAME: "selenium",
@@ -126,29 +147,57 @@ local build(arch, test_ui, dind) = [{
           "py.test -x -s upgrade.py --distro=buster --ui-mode=desktop --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=" + name + ".buster.com --app=" + name + " --browser=" + browser,
         ]
     },
-        {
-            name: "upload",
-        image: "debian:buster-slim",
-        environment: {
-            AWS_ACCESS_KEY_ID: {
-                from_secret: "AWS_ACCESS_KEY_ID"
+            {
+              name: 'upload',
+              image: 'debian:buster-slim',
+              environment: {
+                AWS_ACCESS_KEY_ID: {
+                  from_secret: 'AWS_ACCESS_KEY_ID',
+                },
+                AWS_SECRET_ACCESS_KEY: {
+                  from_secret: 'AWS_SECRET_ACCESS_KEY',
+                },
+                SYNCLOUD_TOKEN: {
+                  from_secret: 'SYNCLOUD_TOKEN',
+                },
+              },
+              commands: [
+                'PACKAGE=$(cat package.name)',
+                'apt update && apt install -y wget',
+                'wget ' + deployer + '-' + arch + ' -O release --progress=dot:giga',
+                'chmod +x release',
+                './release publish -f $PACKAGE -b $DRONE_BRANCH',
+              ],
+              when: {
+                branch: ['stable', 'master'],
+                event: ['push'],
+              },
             },
-            AWS_SECRET_ACCESS_KEY: {
-                from_secret: "AWS_SECRET_ACCESS_KEY"
-            }
-        },
-        commands: [
-          "PACKAGE=$(cat package.name)",
-          "apt update && apt install -y wget",
-          "wget https://github.com/syncloud/snapd/releases/download/1/syncloud-release-" + arch,
-          "chmod +x syncloud-release-*",
-          "./syncloud-release-* publish -f $PACKAGE -b $DRONE_BRANCH"
-         ],
-        when: {
-            branch: ["stable", "master"],
-            event: [ "push" ]
-        }
-        }] + [
+            {
+                  name: 'promote',
+                  image: 'debian:buster-slim',
+                  environment: {
+                    AWS_ACCESS_KEY_ID: {
+                      from_secret: 'AWS_ACCESS_KEY_ID',
+                    },
+                    AWS_SECRET_ACCESS_KEY: {
+                      from_secret: 'AWS_SECRET_ACCESS_KEY',
+                    },
+                    SYNCLOUD_TOKEN: {
+                      from_secret: 'SYNCLOUD_TOKEN',
+                    },
+                  },
+                  commands: [
+                    'apt update && apt install -y wget',
+                    'wget ' + deployer + '-' + arch + ' -O release --progress=dot:giga',
+                    'chmod +x release',
+                    './release promote -n ' + name + ' -a $(dpkg --print-architecture)',
+                  ],
+                  when: {
+                    branch: ['stable'],
+                    event: ['push'],
+                  },
+                },
         {
             name: "artifact",
             image: "appleboy/drone-scp:1.6.4",
@@ -205,15 +254,7 @@ local build(arch, test_ui, dind) = [{
                 }
             ]
         }
-    ] + ( if test_ui then [{
-            name: "selenium",
-            image: "selenium/standalone-" + browser + ":4.0.0-beta-3-prerelease-20210402",
-            volumes: [{
-                name: "shm",
-                path: "/dev/shm"
-            }]
-        }
-    ] else [] ),
+    ],
     volumes: [
         {
             name: "dbus",
@@ -240,41 +281,7 @@ local build(arch, test_ui, dind) = [{
             temp: {}
         },
       ]
-},
- {
-      kind: "pipeline",
-      type: "docker",
-      name: "promote-" + arch,
-      platform: {
-          os: "linux",
-          arch: arch
-      },
-      steps: [
-      {
-              name: "promote",
-              image: "debian:buster-slim",
-              environment: {
-                  AWS_ACCESS_KEY_ID: {
-                      from_secret: "AWS_ACCESS_KEY_ID"
-                  },
-                  AWS_SECRET_ACCESS_KEY: {
-                      from_secret: "AWS_SECRET_ACCESS_KEY"
-                  }
-              },
-              commands: [
-                "apt update && apt install -y wget",
-                "wget https://github.com/syncloud/snapd/releases/download/1/syncloud-release-" + arch + " -O release --progress=dot:giga",
-                "chmod +x release",
-                "./release promote -n " + name + " -a $(dpkg --print-architecture)"
-              ]
-        }
-       ],
-       trigger: {
-        event: [
-          "promote"
-        ]
-      }
-  }];
+}];
 
 build("amd64", true, "20.10.21-dind") +
 build("arm64", false, "20.10.21-dind") +
