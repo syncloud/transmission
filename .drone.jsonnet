@@ -2,7 +2,6 @@ local name = "transmission";
 local browser = "firefox";
 local version = "4.0.5";
 local nginx = "1.24.0";
-local authelia = "master";
 
 local build(arch, test_ui, dind) = [{
     kind: "pipeline",
@@ -25,19 +24,6 @@ local build(arch, test_ui, dind) = [{
             image: "docker:" + dind,
                 commands: [
                 "./nginx/build.sh " + nginx
-            ],
-            volumes: [
-                {
-                    name: "dockersock",
-                    path: "/var/run"
-                }
-            ]
-        },
-      {
-            name: "authelia",
-            image: "docker:" + dind,
-            commands: [
-                "./authelia/package.sh " + authelia
             ],
             volumes: [
                 {
