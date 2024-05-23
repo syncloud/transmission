@@ -98,7 +98,7 @@ local build(arch, test_ui, dind) = [{
             }],
             commands: [
                 "cat /etc/hosts",
-                "getent hosts "auth.buster.com | sed 's/auth.buster.com/" + name +".buster.com/g' | sudo tee -a /etc/hosts",
+                "getent hosts auth.buster.com | sed 's/auth.buster.com/" + name +".buster.com/g' | sudo tee -a /etc/hosts",
                 "cat /etc/hosts",
                 "/opt/bin/entry_point.sh"
             ]
@@ -127,7 +127,7 @@ local build(arch, test_ui, dind) = [{
             image: "python:3.8-slim-buster",
             commands: [
               "cd test",
-              "getent hosts "auth.buster.com | sed 's/auth.buster.com/" + name +".buster.com/g' | sudo tee -a /etc/hosts",
+              "getent hosts auth.buster.com | sed 's/auth.buster.com/" + name +".buster.com/g' | sudo tee -a /etc/hosts",
               "./deps.sh",
               "py.test -x -s ui.py --distro=buster --ui-mode=desktop --domain=buster.com --device-host=" + name + ".buster.com --app=" + name + " --browser-height=2000 --browser=" + browser,
             ],
