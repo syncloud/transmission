@@ -35,6 +35,7 @@ def module_setup(request, device, app_dir, artifact_dir):
         device.run_ssh('ls -la /data > {0}/data.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /data/transmission > {0}/data.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('cat /etc/hosts > {0}/hosts.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ping -c 1 auth.buster.com > {0}/ping.log'.format(TMP_DIR), throw=False)
 
         app_log_dir = join(artifact_dir, 'log')
         os.mkdir(app_log_dir)
