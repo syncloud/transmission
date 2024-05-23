@@ -1,11 +1,13 @@
 package installer
 
 import (
+	"fmt"
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/config"
 	"github.com/syncloud/golib/platform"
 	"os"
 	"path"
+	"strings"
 )
 
 const (
@@ -23,8 +25,8 @@ type Installer struct {
 }
 
 type Variables struct {
-	Domain     string
-	AuthDomain string
+	Domain      string
+	AuthAddress string
 }
 
 func New() *Installer {
@@ -133,16 +135,21 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	authDomain, err := i.platformClient.GetAppDomainName("auth")
+	authAddress, err := i.platformClient.GetAppUrl("auth")
 	if err != nil {
 		return err
+	}
+
+	authAddress = strings.TrimPrefix(authAddress, "https://")
+	if !strings.Contains(authAddress, ":") {
+		authAddress = fmt.Sprintf("%s:443", authAddress)
 	}
 
 	err = config.Generate(
 		path.Join(AppDir, "config"),
 		path.Join(DataDir, "config"),
 		Variables{
-			AuthDomain: authDomain,
+			AuthAddress: authAddress,
 		},
 	)
 
