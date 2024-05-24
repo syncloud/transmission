@@ -1,13 +1,11 @@
 package installer
 
 import (
-	"fmt"
 	cp "github.com/otiai10/copy"
 	"github.com/syncloud/golib/config"
 	"github.com/syncloud/golib/platform"
 	"os"
 	"path"
-	"strings"
 )
 
 const (
