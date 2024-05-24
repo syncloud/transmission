@@ -141,17 +141,11 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	authAddress := strings.TrimPrefix(authUrl, "https://")
-	if !strings.Contains(authAddress, ":") {
-		authAddress = fmt.Sprintf("%s:443", authAddress)
-	}
-
 	err = config.Generate(
 		path.Join(AppDir, "config"),
 		path.Join(DataDir, "config"),
 		Variables{
-			AuthAddress: authAddress,
-			AuthUrl:     authUrl,
+			AuthUrl: authUrl,
 		},
 	)
 
