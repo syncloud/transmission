@@ -17,6 +17,7 @@ def module_setup(request, device, artifact_dir, ui_mode):
         device.scp_from_device('{0}/*'.format(TMP_DIR), join(artifact_dir, 'log'))
         check_output('cp /videos/* {0}'.format(artifact_dir), shell=True)
         check_output('chmod -R a+r {0}'.format(artifact_dir), shell=True)
+        selenium.log()
 
     request.addfinalizer(module_teardown)
 
@@ -41,8 +42,4 @@ def test_login(selenium, device_user, device_password):
     selenium.find_by(By.ID, "sign-in-button").click()
     selenium.find_by(By.ID, "toolbar-open")
     selenium.screenshot('main')
-
-
-def test_teardown(driver):
-    driver.quit()
 
