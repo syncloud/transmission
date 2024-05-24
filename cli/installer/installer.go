@@ -27,6 +27,7 @@ type Installer struct {
 type Variables struct {
 	Domain      string
 	AuthAddress string
+	AuthUrl     string
 }
 
 func New() *Installer {
@@ -135,12 +136,12 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	authAddress, err := i.platformClient.GetAppUrl("auth")
+	authUrl, err := i.platformClient.GetAppUrl("auth")
 	if err != nil {
 		return err
 	}
 
-	authAddress = strings.TrimPrefix(authAddress, "https://")
+	authAddress := strings.TrimPrefix(authUrl, "https://")
 	if !strings.Contains(authAddress, ":") {
 		authAddress = fmt.Sprintf("%s:443", authAddress)
 	}
@@ -150,6 +151,7 @@ func (i *Installer) UpdateConfigs() error {
 		path.Join(DataDir, "config"),
 		Variables{
 			AuthAddress: authAddress,
+			AuthUrl:     authUrl,
 		},
 	)
 

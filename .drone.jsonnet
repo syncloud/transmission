@@ -80,8 +80,9 @@ local build(arch, test_ui, dind) = [{
             commands: [
               "APP_ARCHIVE_PATH=$(realpath $(cat package.name))",
               "cd test",
+              "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
               "./deps.sh",
-              "py.test -x -s test.py --distro=buster --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=auth.buster.com --app=" + name + " --arch=" + arch
+              "py.test -x -s test.py --distro=buster --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=" + name + ".buster.com --app=" + name + " --arch=" + arch
             ]
         }] + ( if test_ui then [
 {
@@ -98,7 +99,7 @@ local build(arch, test_ui, dind) = [{
             }],
             commands: [
                 "cat /etc/hosts",
-                "getent hosts auth.buster.com | sed 's/auth.buster.com/" + name +".buster.com/g' | sudo tee -a /etc/hosts",
+                "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
                 "cat /etc/hosts",
                 "/opt/bin/entry_point.sh"
             ]
@@ -127,9 +128,9 @@ local build(arch, test_ui, dind) = [{
             image: "python:3.8-slim-buster",
             commands: [
               "cd test",
-              "getent hosts auth.buster.com | sed 's/auth.buster.com/" + name +".buster.com/g' | tee -a /etc/hosts",
+              "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | tee -a /etc/hosts",
               "./deps.sh",
-              "py.test -x -s ui.py --distro=buster --ui-mode=desktop --domain=buster.com --device-host=auth.buster.com --app=" + name + " --browser-height=2000 --browser=" + browser,
+              "py.test -x -s ui.py --distro=buster --ui-mode=desktop --domain=buster.com --device-host=" + name + ".buster.com --app=" + name + " --browser-height=2000 --browser=" + browser,
             ],
             volumes: [{
                 name: "videos",
@@ -144,8 +145,9 @@ local build(arch, test_ui, dind) = [{
         commands: [
           "APP_ARCHIVE_PATH=$(realpath $(cat package.name))",
           "cd test",
+          "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | tee -a /etc/hosts",
           "./deps.sh",
-          "py.test -x -s upgrade.py --distro=buster --ui-mode=desktop --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=auth.buster.com --app=" + name + " --browser=" + browser,
+          "py.test -x -s upgrade.py --distro=buster --ui-mode=desktop --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=" + name + ".buster.com --app=" + name + " --browser=" + browser,
         ]
     },
             {
@@ -241,7 +243,7 @@ local build(arch, test_ui, dind) = [{
             ]
         },
         {
-            name: "auth.buster.com",
+            name: name + ".buster.com",
             image: "syncloud/platform-buster-" + arch + ":22.02",
             privileged: true,
             volumes: [
