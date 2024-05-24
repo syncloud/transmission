@@ -1,10 +1,8 @@
 import pytest
 from os.path import dirname, join
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from subprocess import check_output
 from syncloudlib.integration.hosts import add_host_alias
-from selenium.webdriver.support import expected_conditions as EC
 
 DIR = dirname(__file__)
 TMP_DIR = '/tmp/syncloud/ui'
@@ -30,6 +28,7 @@ def test_start(module_setup, app, domain, device_host):
 def test_auth(selenium, device_user, device_password, domain):
     selenium.driver.get("https://auth.{0}".format(domain))
     selenium.find_by(By.ID, "username-textfield").send_keys(device_user)
+    selenium.screenshot('auth')
 
 
 def test_login(selenium, device_user, device_password):
