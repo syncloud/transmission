@@ -80,7 +80,7 @@ local build(arch, test_ui, dind) = [{
             commands: [
               "APP_ARCHIVE_PATH=$(realpath $(cat package.name))",
               "cd test",
-              "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | sudo tee -a /etc/hosts",
+              "getent hosts " + name + ".buster.com | sed 's/" + name +".buster.com/auth.buster.com/g' | tee -a /etc/hosts",
               "./deps.sh",
               "py.test -x -s test.py --distro=buster --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=" + name + ".buster.com --app=" + name + " --arch=" + arch
             ]
