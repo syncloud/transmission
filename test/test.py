@@ -20,7 +20,6 @@ def module_setup(request, device, app_dir, artifact_dir):
     def module_teardown():
         device.run_ssh('ls -la /var/snap/transmission/current/config > {0}/config.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('cp /var/snap/transmission/current/config/transmission/settings.json {0}/transmission.settings.json.log'.format(TMP_DIR), throw=False)
-        device.run_ssh('cp /var/snap/transmission/current/config/authelia/config.yaml {0}/authelia.config.yaml.log'.format(TMP_DIR), throw=False)
         device.run_ssh('top -bn 1 -w 500 -c > {0}/top.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ps auxfw > {0}/ps.log'.format(TMP_DIR), throw=False)
         device.run_ssh('netstat -nlp > {0}/netstat.log'.format(TMP_DIR), throw=False)
@@ -35,6 +34,8 @@ def module_setup(request, device, app_dir, artifact_dir):
                        throw=False)
         device.run_ssh('ls -la /data > {0}/data.ls.log'.format(TMP_DIR), throw=False)
         device.run_ssh('ls -la /data/transmission > {0}/data.ls.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('cat /etc/hosts > {0}/hosts.log'.format(TMP_DIR), throw=False)
+        device.run_ssh('ping -c 1 auth.buster.com > {0}/ping.log'.format(TMP_DIR), throw=False)
 
         app_log_dir = join(artifact_dir, 'log')
         os.mkdir(app_log_dir)
@@ -49,11 +50,12 @@ def test_start(module_setup, device, device_host, app, domain):
     add_host_alias(app, device_host, domain)
     device.run_ssh('date', retries=100)
     device.run_ssh('mkdir {0}'.format(TMP_DIR))
-  
+
 
 def test_activate_device(device):
     response = retry(device.activate_custom)
     assert response.status_code == 200, response.text
+    device.run_ssh('snap refresh platform --channel=master')
 
 
 def test_install(app_archive_path, device_host, device_password):

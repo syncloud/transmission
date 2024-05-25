@@ -1,17 +1,15 @@
 import pytest
 from os.path import dirname, join
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from subprocess import check_output
 from syncloudlib.integration.hosts import add_host_alias
-from selenium.webdriver.support import expected_conditions as EC
 
 DIR = dirname(__file__)
 TMP_DIR = '/tmp/syncloud/ui'
 
 
 @pytest.fixture(scope="session")
-def module_setup(request, device, artifact_dir, ui_mode):
+def module_setup(request, device, artifact_dir, ui_mode, selenium):
     def module_teardown():
         device.activated()
         device.run_ssh('mkdir -p {0}'.format(TMP_DIR), throw=False)
@@ -19,12 +17,19 @@ def module_setup(request, device, artifact_dir, ui_mode):
         device.scp_from_device('{0}/*'.format(TMP_DIR), join(artifact_dir, 'log'))
         check_output('cp /videos/* {0}'.format(artifact_dir), shell=True)
         check_output('chmod -R a+r {0}'.format(artifact_dir), shell=True)
+        selenium.log()
 
     request.addfinalizer(module_teardown)
 
 
 def test_start(module_setup, app, domain, device_host):
     add_host_alias(app, device_host, domain)
+
+
+def test_auth(selenium, device_user, device_password, domain):
+    selenium.driver.get("https://auth.{0}".format(domain))
+    selenium.find_by(By.ID, "username-textfield").send_keys(device_user)
+    selenium.screenshot('auth')
 
 
 def test_login(selenium, device_user, device_password):
@@ -37,8 +42,4 @@ def test_login(selenium, device_user, device_password):
     selenium.find_by(By.ID, "sign-in-button").click()
     selenium.find_by(By.ID, "toolbar-open")
     selenium.screenshot('main')
-
-
-def test_teardown(driver):
-    driver.quit()
 
