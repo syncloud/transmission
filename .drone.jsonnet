@@ -155,8 +155,8 @@ local build(arch, test_ui, dind) = [{
         name: 'test-upgrade',
               image: 'python:' + python,
               commands: [
-                'DOMAIN="' + distro + '.com"',
-                'APP_DOMAIN="' + name + '.' + distro + '.com"',
+                'DOMAIN="' + distro_default + '.com"',
+                'APP_DOMAIN="' + name + '.' + distro_default + '.com"',
                 'getent hosts $APP_DOMAIN | sed "s/$APP_DOMAIN/auth.$DOMAIN/g" | tee -a /etc/hosts',
                 'cat /etc/hosts',
                 'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
