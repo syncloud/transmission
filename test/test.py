@@ -55,7 +55,7 @@ def test_start(module_setup, device, device_host, app, domain):
 def test_activate_device(device):
     response = retry(device.activate_custom)
     assert response.status_code == 200, response.text
-    device.run_ssh('snap refresh platform --channel=master')
+    #device.run_ssh('snap refresh platform --channel=master')
 
 
 def test_install(app_archive_path, device_host, device_password):
