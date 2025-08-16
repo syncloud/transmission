@@ -5,7 +5,7 @@ local nginx = "1.24.0";
 local platform = '25.02';
 local selenium = '4.21.0-20240517';
 local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
-local python = '3.9-slim-buster';
+local python = '3.9-slim-bookworm';
 local distro_default = 'buster';
 local distros = ['bookworm', 'buster'];
 
