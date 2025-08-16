@@ -20,7 +20,7 @@ local build(arch, test_ui, dind) = [{
     steps: [
         {
             name: "version",
-            image: "debian:buster-slim",
+            image: "debian:bookworm-slim",
             commands: [
                 "echo $DRONE_BUILD_NUMBER > version"
             ]
@@ -54,7 +54,7 @@ local build(arch, test_ui, dind) = [{
         },
  {
             name: "test transmission",
-            image: "debian:buster-slim",
+            image: "debian:bookworm-slim",
             commands: [
                 "./transmission/test.sh"
             ]
@@ -73,7 +73,7 @@ local build(arch, test_ui, dind) = [{
         },
         {
             name: "package",
-            image: "debian:buster-slim",
+            image: "debian:bookworm-slim",
             commands: [
                 "VERSION=$(cat version)",
                 "./package.sh " + name + " $VERSION "
@@ -167,7 +167,7 @@ local build(arch, test_ui, dind) = [{
     },
             {
               name: 'upload',
-              image: 'debian:buster-slim',
+              image: 'debian:bookworm-slim',
               environment: {
                 AWS_ACCESS_KEY_ID: {
                   from_secret: 'AWS_ACCESS_KEY_ID',
@@ -193,7 +193,7 @@ local build(arch, test_ui, dind) = [{
             },
             {
                   name: 'promote',
-                  image: 'debian:buster-slim',
+                  image: 'debian:bookworm-slim',
                   environment: {
                     AWS_ACCESS_KEY_ID: {
                       from_secret: 'AWS_ACCESS_KEY_ID',
