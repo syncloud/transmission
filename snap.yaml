@@ -7,6 +7,7 @@ apps:
     - network
     - network-bind
     restart-condition: always
+    restart-delay: 10s
   daemon:
     user: transmission
     command: bin/service.daemon.sh
@@ -15,6 +16,7 @@ apps:
     - network
     - network-bind
     restart-condition: always
+    restart-delay: 10s
 
   storage-change:
     command: bin/cli storage-change
