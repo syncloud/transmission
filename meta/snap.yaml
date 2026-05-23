@@ -34,7 +34,7 @@ apps:
     command: bin/cli restore-post-start
 
 confinement: strict
-description: Transmission
+description: A Fast, Easy and Free Bittorrent Client
 grade: stable
 name: transmission
 summary: Transmission
