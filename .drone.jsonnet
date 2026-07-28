@@ -4,7 +4,7 @@ local version = '4.0.5';
 local nginx = '1.24.0';
 local platform = '25.02';
 local selenium = '4.21.0-20240517';
-local deployer = 'https://github.com/syncloud/store/releases/download/4/syncloud-release';
+local store_publisher = 'stable-346';
 local python = '3.9-slim-bookworm';
 local distro_default = 'buster';
 local distros = ['bookworm', 'buster'];
@@ -166,53 +166,14 @@ local build(arch, test_ui, dind) = [{
       ],
     },
     {
-      name: 'upload',
-      image: 'debian:bookworm-slim',
+      name: 'publish',
+      image: 'syncloud/store-publisher:' + store_publisher,
       environment: {
-        AWS_ACCESS_KEY_ID: {
-          from_secret: 'AWS_ACCESS_KEY_ID',
-        },
-        AWS_SECRET_ACCESS_KEY: {
-          from_secret: 'AWS_SECRET_ACCESS_KEY',
-        },
-        SYNCLOUD_TOKEN: {
-          from_secret: 'SYNCLOUD_TOKEN',
-        },
+        SYNCLOUD_TOKEN: { from_secret: 'SYNCLOUD_TOKEN' },
       },
-      commands: [
-        'PACKAGE=$(cat package.name)',
-        'apt update && apt install -y wget',
-        'wget ' + deployer + '-' + arch + ' -O release --progress=dot:giga',
-        'chmod +x release',
-        './release publish -f $PACKAGE -b $DRONE_BRANCH',
-      ],
+      command: ['snap', '-c', '${DRONE_BRANCH}'],
       when: {
-        branch: ['stable', 'master'],
-        event: ['push'],
-      },
-    },
-    {
-      name: 'promote',
-      image: 'debian:bookworm-slim',
-      environment: {
-        AWS_ACCESS_KEY_ID: {
-          from_secret: 'AWS_ACCESS_KEY_ID',
-        },
-        AWS_SECRET_ACCESS_KEY: {
-          from_secret: 'AWS_SECRET_ACCESS_KEY',
-        },
-        SYNCLOUD_TOKEN: {
-          from_secret: 'SYNCLOUD_TOKEN',
-        },
-      },
-      commands: [
-        'apt update && apt install -y wget',
-        'wget ' + deployer + '-' + arch + ' -O release --progress=dot:giga',
-        'chmod +x release',
-        './release promote -n ' + name + ' -a $(dpkg --print-architecture)',
-      ],
-      when: {
-        branch: ['stable'],
+        branch: ['master', 'stable'],
         event: ['push'],
       },
     },
