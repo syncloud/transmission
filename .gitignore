@@ -1,3 +1,7 @@
 .idea
 *.iml
 venv
+node_modules/
+artifact/
+__pycache__/
+*.pyc

@@ -28,7 +28,7 @@ fi
 cmake --install .
 
 # cleanup
-apt-get -y purge build-essential
+apt-get -y purge build-essential python3
 apt-get -y autoremove
 rm -rf \
     /tmp/* \
@@ -44,5 +44,7 @@ cp -r /lib* ${TARGET}
 cp -r /usr ${TARGET}
 
 cp $DIR/transmission.sh ${TARGET}/bin
+
+rm -rf ${TARGET}/usr/bin/python3* ${TARGET}/usr/lib/python3*
 
 ldd ${TARGET}/usr/local/bin/transmission-daemon

@@ -23,9 +23,9 @@ type Installer struct {
 }
 
 type Variables struct {
-	Domain      string
-	AuthAddress string
-	AuthUrl     string
+	Domain          string
+	AuthAddress     string
+	AuthLocalSocket string
 }
 
 func New() *Installer {
@@ -134,16 +134,11 @@ func (i *Installer) UpdateConfigs() error {
 		return err
 	}
 
-	authUrl, err := i.platformClient.GetAppUrl("auth")
-	if err != nil {
-		return err
-	}
-
 	err = config.Generate(
 		path.Join(AppDir, "config"),
 		path.Join(DataDir, "config"),
 		Variables{
-			AuthUrl: authUrl,
+			AuthLocalSocket: i.platformClient.GetAuthLocalSocket(),
 		},
 	)
 
