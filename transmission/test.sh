@@ -8,3 +8,5 @@ du -d10 -h $PREFIX | sort -h | tail -100
 ldd ${PREFIX}/usr/local/bin/transmission-daemon
 ls -la ${PREFIX}/bin
 ${PREFIX}/bin/transmission.sh --help
+
+test -z "$(find ${PREFIX} -name 'python3*' -print -quit)"
