@@ -1,41 +1,24 @@
 import { defineConfig, devices } from '@playwright/test'
+import { env } from './helpers/env'
 
-const fullDomain = process.env.PLAYWRIGHT_FULL_DOMAIN ?? 'buster.com'
-const appDomain = process.env.PLAYWRIGHT_APP_DOMAIN ?? `transmission.${fullDomain}`
-const artifactDir = process.env.PLAYWRIGHT_ARTIFACT_DIR ?? 'artifact'
+const appDomain = env('PLAYWRIGHT_APP_DOMAIN')
 
 export default defineConfig({
   testDir: './specs',
   fullyParallel: false,
   workers: 1,
   retries: process.env.CI ? 1 : 0,
-  maxFailures: 0,
-  reporter: [['list'], ['html', { outputFolder: `${artifactDir}/playwright/report`, open: 'never' }]],
-  outputDir: `${artifactDir}/playwright/test-results`,
-  globalSetup: './globalSetup.ts',
-  globalTeardown: './globalTeardown.ts',
+  reporter: 'list',
   timeout: 120_000,
   expect: { timeout: 30_000 },
   use: {
     baseURL: `https://${appDomain}`,
     ignoreHTTPSErrors: true,
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    video: 'on',
   },
   projects: [
     {
       name: 'desktop',
-      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 2000 } },
-    },
-    {
-      name: 'mobile',
-      use: { ...devices['Pixel 7'] },
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 960 } },
     },
   ],
-  metadata: {
-    appDomain,
-    fullDomain,
-    artifactDir,
-  },
 })

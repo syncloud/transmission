@@ -3,10 +3,11 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 PREFIX=${DIR}/../build/snap/transmission
 
-du -d10 -h $PREFIX | sort -h | tail -100
-
-ldd ${PREFIX}/usr/local/bin/transmission-daemon
-ls -la ${PREFIX}/bin
 ${PREFIX}/bin/transmission.sh --help
+${PREFIX}/bin/transmission.sh --version
 
 test -z "$(find ${PREFIX} -name 'python3*' -print -quit)"
+
+test -f ${PREFIX}/usr/local/share/transmission/public_html/index.html
+test -f ${PREFIX}/usr/local/share/transmission/public_html-legacy/index.html
+test -f ${PREFIX}/usr/local/share/transmission/public_html-legacy/transmission-app.js

@@ -6,28 +6,32 @@ cd ${DIR}
 BUILD_DIR=${DIR}/build
 VERSION=$1
 ARCH=$2
+WEB_LEGACY=$3
 
 rm -rf ${BUILD_DIR}
 mkdir -p ${BUILD_DIR}
 
-apt update
-apt -y install build-essential cmake wget libcurl4-openssl-dev libssl-dev python3 ninja-build
+${DIR}/../apt.sh build-essential cmake wget libcurl4-openssl-dev libssl-dev python3 ninja-build
 cd ${BUILD_DIR}
-wget --progress dot:giga https://github.com/transmission/transmission/releases/download/$VERSION/transmission-$VERSION.tar.xz
+${DIR}/../download-retry.sh https://github.com/transmission/transmission/releases/download/$VERSION/transmission-$VERSION.tar.xz transmission-$VERSION.tar.xz
 tar xf transmission-$VERSION.tar.xz
 cd transmission-$VERSION
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_QT=OFF -DENABLE_MAC=OFF -DENABLE_GTK=OFF -DENABLE_TESTS=OFF
 cd build
 
 if [[ $ARCH == "arm" ]]; then
-  cmake --build . -j 4
+  cmake --build . -j 2
 else
   cmake --build .
 fi
 
 cmake --install .
 
-# cleanup
+cd ${BUILD_DIR}
+${DIR}/../download-retry.sh https://github.com/transmission/transmission/releases/download/$WEB_LEGACY/transmission-$WEB_LEGACY.tar.xz transmission-$WEB_LEGACY.tar.xz
+tar xf transmission-$WEB_LEGACY.tar.xz transmission-$WEB_LEGACY/web/public_html
+cp -r transmission-$WEB_LEGACY/web/public_html /usr/local/share/transmission/public_html-legacy
+
 apt-get -y purge build-essential python3
 apt-get -y autoremove
 rm -rf \

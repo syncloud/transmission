@@ -5,3 +5,7 @@ node_modules/
 artifact/
 __pycache__/
 *.pyc
+build/
+version
+package.name
+*.snap
