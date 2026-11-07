@@ -1,21 +1,14 @@
-import { Page, expect } from '@playwright/test'
+import { expect, Page } from '@playwright/test'
+import { env } from './env'
 
-const deviceUser = required('PLAYWRIGHT_DEVICE_USER')
-const devicePassword = required('PLAYWRIGHT_DEVICE_PASSWORD')
+const username = env('PLAYWRIGHT_DEVICE_USER')
+const password = env('PLAYWRIGHT_DEVICE_PASSWORD')
 
-function required(name: string): string {
-  const v = process.env[name]
-  if (!v) throw new Error(`${name} is required`)
-  return v
-}
-
-export async function fillCredentials(page: Page) {
-  await page.locator('#username-textfield').fill(deviceUser)
-  await page.locator('#password-textfield').fill(devicePassword)
-}
-
-export async function signIn(page: Page) {
-  await fillCredentials(page)
-  await page.locator('#sign-in-button').click()
+export async function loginViaAuthelia(page: Page) {
+  await page.goto('/')
+  await page.waitForURL((url) => url.host.startsWith('auth.'))
+  await page.locator('input#username-textfield').fill(username)
+  await page.locator('input#password-textfield').fill(password)
+  await page.locator('button#sign-in-button').click()
   await expect(page.locator('#toolbar-open')).toBeVisible()
 }

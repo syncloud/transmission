@@ -1,7 +1,10 @@
 local name = 'transmission';
-local version = '4.0.5';
+local version = '4.1.4';
+local web_legacy = '4.0.5';
 local nginx = '1.24.0';
-local platform = '26.08.01';
+local platform = '26.10.02';
+local golang = '1.25';
+local debian = 'bookworm-slim';
 local playwright = 'mcr.microsoft.com/playwright:v1.59.1-jammy';
 local store_publisher = 'stable-346';
 local python = '3.12-slim-bookworm';
@@ -10,6 +13,8 @@ local distros = ['bookworm', 'buster'];
 
 local platform_image(distro) =
   'syncloud/platform-' + distro + ':' + platform;
+
+local snapd_hold = "mkdir -p /etc/systemd/system/snapd.service.d && printf '[Service]\\nExecStartPost=/bin/sh -c \"/usr/bin/snap set system refresh.hold=2099-01-01T00:00:00Z\"\\n' > /etc/systemd/system/snapd.service.d/disable-refresh.conf && exec /sbin/init";
 
 local build(arch, test_ui) = [{
   kind: 'pipeline',
@@ -27,42 +32,53 @@ local build(arch, test_ui) = [{
         './nginx/build.sh',
       ],
     },
+  ] + [
     {
-      name: 'nginx test',
-      image: platform_image(distro_default),
+      name: 'nginx test ' + distro,
+      image: platform_image(distro),
       commands: [
         './nginx/test.sh',
       ],
-    },
+    }
+    for distro in distros
+  ] + [
     {
       name: 'transmission',
-      image: 'debian:bookworm-slim',
+      image: 'debian:' + debian,
       commands: [
-        './transmission/build.sh ' + version + ' ' + arch,
+        './transmission/build.sh ' + version + ' ' + arch + ' ' + web_legacy,
       ],
     },
+  ] + [
     {
-      name: 'test transmission',
-      image: 'debian:bookworm-slim',
+      name: 'transmission test ' + distro,
+      image: platform_image(distro),
       commands: [
         './transmission/test.sh',
       ],
-    },
+    }
+    for distro in distros
+  ] + [
     {
       name: 'cli',
-      image: 'golang:1.20',
+      image: 'golang:' + golang,
       commands: [
-        'cd cli',
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/install ./cmd/install",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/configure ./cmd/configure",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/pre-refresh ./cmd/pre-refresh",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/meta/hooks/post-refresh ./cmd/post-refresh",
-        "go build -ldflags '-linkmode external -extldflags -static' -o ../build/snap/bin/cli ./cmd/cli",
+        './cli/build.sh',
       ],
     },
+  ] + [
+    {
+      name: 'cli test ' + distro,
+      image: platform_image(distro),
+      commands: [
+        './cli/test.sh',
+      ],
+    }
+    for distro in distros
+  ] + [
     {
       name: 'package',
-      image: 'debian:bookworm-slim',
+      image: 'debian:' + debian,
       commands: [
         './package.sh ' + name + ' $DRONE_BUILD_NUMBER',
       ],
@@ -72,14 +88,7 @@ local build(arch, test_ui) = [{
       name: 'test ' + distro,
       image: 'python:' + python,
       commands: [
-        'DOMAIN="' + distro + '.com"',
-        'APP_DOMAIN="' + name + '.' + distro + '.com"',
-        'getent hosts $APP_DOMAIN | sed "s/$APP_DOMAIN/auth.$DOMAIN/g" | tee -a /etc/hosts',
-        'cat /etc/hosts',
-        'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
-        'cd test',
-        './deps.sh',
-        'py.test -x -s test.py --distro=' + distro + ' --domain=' + distro + '.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=' + name + '.' + distro + '.com --app=' + name + ' --arch=' + arch,
+        './ci/test.sh test.py ' + distro + ' ' + arch,
       ],
     }
     for distro in distros
@@ -88,14 +97,23 @@ local build(arch, test_ui) = [{
            name: 'e2e',
            image: playwright,
            commands: [
-             './test/e2e/run.sh e2e specs/01-login.spec.ts',
+             './test/e2e/run.sh specs/01-smoke.spec.ts',
            ],
          },
+       ] else []) + [
+    {
+      name: 'test-upgrade-prev',
+      image: 'python:' + python,
+      commands: [
+        './ci/test.sh upgrade_prev.py ' + distro_default + ' ' + arch,
+      ],
+    },
+  ] + (if test_ui then [
          {
-           name: 'e2e-mobile',
+           name: 'e2e-before-upgrade',
            image: playwright,
            commands: [
-             './test/e2e/run.sh e2e-mobile specs/01-login.spec.ts mobile',
+             './test/e2e/run.sh specs/02-pre-upgrade.spec.ts',
            ],
          },
        ] else []) + [
@@ -103,16 +121,18 @@ local build(arch, test_ui) = [{
       name: 'test-upgrade',
       image: 'python:' + python,
       commands: [
-        'DOMAIN="' + distro_default + '.com"',
-        'APP_DOMAIN="' + name + '.' + distro_default + '.com"',
-        'getent hosts $APP_DOMAIN | sed "s/$APP_DOMAIN/auth.$DOMAIN/g" | tee -a /etc/hosts',
-        'cat /etc/hosts',
-        'APP_ARCHIVE_PATH=$(realpath $(cat package.name))',
-        'cd test',
-        './deps.sh',
-        'py.test -x -s upgrade.py --distro=buster --domain=buster.com --app-archive-path=$APP_ARCHIVE_PATH --device-host=' + name + '.buster.com --app=' + name,
+        './ci/test.sh upgrade.py ' + distro_default + ' ' + arch,
       ],
     },
+  ] + (if test_ui then [
+         {
+           name: 'e2e-after-upgrade',
+           image: playwright,
+           commands: [
+             './test/e2e/run.sh specs/03-post-upgrade.spec.ts',
+           ],
+         },
+       ] else []) + [
     {
       name: 'publish',
       image: 'syncloud/store-publisher:' + store_publisher,
@@ -156,7 +176,7 @@ local build(arch, test_ui) = [{
       name: name + '.' + distro + '.com',
       image: platform_image(distro),
       privileged: true,
-      entrypoint: ['/bin/sh', '-c', "mkdir -p /etc/systemd/system/snapd.service.d && printf '[Service]\\nExecStartPost=/bin/sh -c \"/usr/bin/snap set system refresh.hold=2099-01-01T00:00:00Z\"\\n' > /etc/systemd/system/snapd.service.d/disable-refresh.conf && exec /sbin/init"],
+      entrypoint: ['/bin/sh', '-c', snapd_hold],
       volumes: [
         {
           name: 'dbus',

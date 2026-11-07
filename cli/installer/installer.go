@@ -20,6 +20,7 @@ type Installer struct {
 	currentVersionFile string
 	configDir          string
 	platformClient     *platform.Client
+	settings           *Settings
 }
 
 type Variables struct {
@@ -36,6 +37,7 @@ func New() *Installer {
 		currentVersionFile: path.Join(DataDir, "version"),
 		configDir:          configDir,
 		platformClient:     platform.New(),
+		settings:           NewSettings(path.Join(AppDir, "config-default"), configDir),
 	}
 }
 
@@ -128,7 +130,6 @@ func (i *Installer) UpdateVersion() error {
 }
 
 func (i *Installer) UpdateConfigs() error {
-
 	err := cp.Copy(path.Join(AppDir, "config"), path.Join(DataDir, "config"))
 	if err != nil {
 		return err
@@ -141,9 +142,11 @@ func (i *Installer) UpdateConfigs() error {
 			AuthLocalSocket: i.platformClient.GetAuthLocalSocket(),
 		},
 	)
+	if err != nil {
+		return err
+	}
 
-	return err
-
+	return i.settings.Seed()
 }
 
 func (i *Installer) FixPermissions() error {
